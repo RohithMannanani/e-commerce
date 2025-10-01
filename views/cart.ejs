@@ -1,1 +1,65 @@
+<%- include('partials/header') %>
 
+
+<div class="cart-container">
+  <h1>Shopping Cart</h1>
+
+  <% if (!session.cart || session.cart.totalQty === 0) { %>
+    <div class="empty-cart">
+      <p>Your cart is empty</p>
+      <a href="/" class="btn btn-primary">Continue Shopping</a>
+    </div>
+  <% } else { %>
+    <div class="cart-content">
+      <div class="cart-items">
+        <% Object.entries(session.cart.items).forEach(([productId, item]) => { %>
+          <div class="cart-item">
+            <div class="item-image">
+              <img src="<%= item.image %>" alt="<%= item.name %>">
+            </div>
+            <div class="item-details">
+              <h3><%= item.name %></h3>
+              <p class="item-price">$<%= item.price.toFixed(2) %></p>
+            </div>
+            <div class="item-quantity">
+              <form action="/cart/update" method="POST" class="quantity-form">
+                <input type="hidden" name="productId" value="<%= productId %>">
+                <button type="submit" name="action" value="decrease" class="qty-btn">-</button>
+                <span class="qty-value"><%= item.qty %></span>
+                <button type="submit" name="action" value="increase" class="qty-btn">+</button>
+              </form>
+            </div>
+            <div class="item-total">
+              $<%= (item.price * item.qty).toFixed(2) %>
+            </div>
+            <div class="item-remove">
+              <form action="/cart/remove" method="POST">
+                <input type="hidden" name="productId" value="<%= productId %>">
+                <button type="submit" class="remove-btn" onclick="return confirm('Remove this item?')">×</button>
+              </form>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="cart-summary">
+        <h2>Order Summary</h2>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>$<%= session.cart.totalPrice.toFixed(2) %></span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span>Free</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>$<%= session.cart.totalPrice.toFixed(2) %></span>
+        </div>
+        <a href="/checkout" class="btn btn-primary checkout-btn">Proceed to Checkout</a>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

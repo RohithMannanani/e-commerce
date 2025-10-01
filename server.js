@@ -16,11 +16,12 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .catch(err => console.error('Mongo connect error', err));
 
   // ...existing code...
+// Basic middleware setup
 app.use((req, res, next) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   next();
 });
-// ...existing code...
+
 // View engine + static
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -54,10 +55,41 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
+const checkoutRoutes = require('./routes/checkout');
+const cartRoutes = require('./routes/cart');
 
-app.use('/', authRoutes);
-app.use('/', userRoutes);
-app.use('/admin', adminRoutes);
+// Debug route to test Express
+app.get('/debug', (req, res) => {
+    res.json({
+        session: req.session,
+        cart: req.session.cart,
+        user: req.session.user
+    });
+});
+
+// Route middleware - order matters!
+app.use('/cart', cartRoutes);        // Cart routes first
+app.use('/checkout', checkoutRoutes); // Then checkout
+app.use('/admin', adminRoutes);       // Then admin
+app.use('/', authRoutes);             // Then auth
+app.use('/', userRoutes);             // Then user routes
+
+// Test route to verify Express is working
+app.get('/test', (req, res) => {
+  res.send('Test route works!');
+});
+
+// 404 handler for undefined routes
+app.use((req, res, next) => {
+  console.log(`404 - Route not found: ${req.method} ${req.url}`);
+  res.status(404).send('Page not found');
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).send('Something broke!');
+});
 
 // Start server
 app.listen(PORT, ()=> console.log(`Server running on http://localhost:${PORT}`));

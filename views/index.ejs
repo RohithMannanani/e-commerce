@@ -6,8 +6,9 @@
       <img src="<%= p.image %>" alt="" width="150">
       <h3><a href="/product/<%= p._id %>"><%= p.name %></a></h3>
       <p>₹ <%= p.price %></p>
-      <form action="/cart/add/<%= p._id %>" method="post">
-        <button>Add to cart</button>
+      <form action="/cart/add/<%= p._id %>" method="POST">
+        <input type="hidden" name="redirectTo" value="/">
+        <button type="submit" class="btn btn-primary">Add to Cart</button>
       </form>
     </div>
   <% }) %>

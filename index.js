@@ -6,6 +6,8 @@ const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const Product = require('./models/Product');
 const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+const cartRoutes = require('./routes/cart');
 
 const app = express();    // Middleware
     app.use(express.urlencoded({ extended: true }));
@@ -39,6 +41,8 @@ app.use((req, res, next) => {
 
     // Routes
     app.use('/', authRoutes); // Add auth routes
+    app.use('/admin', adminRoutes); // Add admin routes
+    app.use('/cart', cartRoutes); // Add cart routes
     app.get('/', async (req, res) => {
     try {
         const products = await Product.find();
